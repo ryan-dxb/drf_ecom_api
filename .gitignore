@@ -3,6 +3,9 @@
 
 .idea
 ./.idea/*
+
+schema.yml
+
 ### Django ###
 *.log
 *.pot
