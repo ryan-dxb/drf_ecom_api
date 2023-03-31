@@ -5,6 +5,7 @@
 ./.idea/*
 
 schema.yml
+commands.txt
 
 ### Django ###
 *.log
