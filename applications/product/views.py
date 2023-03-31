@@ -1,5 +1,6 @@
 from drf_spectacular.utils import extend_schema
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from .models import Category, Brand, Product
@@ -40,3 +41,13 @@ class ProductViewSet(viewsets.ViewSet):
     @extend_schema(responses=ProductSerializer(many=True))
     def list(self, request, *args, **kwargs):
         return Response(self.serializer_class.data)
+
+    @action(detail=False, methods=['get'], url_path=r'category/(?P<category>\w+)/all', url_name='all')
+    def list_product_by_category(self, request, category=None):
+        """
+        A simple ViewSet for listing or retrieving categories by category.
+        """
+
+        filtered_queryset = self.queryset.filter(category__name=category)
+        serializer = ProductSerializer(filtered_queryset, many=True)
+        return Response(serializer.data)
