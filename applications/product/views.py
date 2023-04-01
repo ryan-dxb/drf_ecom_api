@@ -11,6 +11,7 @@ class CategoryViewSet(viewsets.ViewSet):
     """
     A simple ViewSet for listing or retrieving categories.
     """
+
     queryset = Category.objects.all()
     serializer_class = CategorySerializer(queryset, many=True)
 
@@ -23,6 +24,7 @@ class BrandViewSet(viewsets.ViewSet):
     """
     A simple ViewSet for listing or retrieving categories.
     """
+
     queryset = Brand.objects.all()
     serializer_class = BrandSerializer(queryset, many=True)
 
@@ -35,14 +37,40 @@ class ProductViewSet(viewsets.ViewSet):
     """
     A simple ViewSet for listing or retrieving categories.
     """
+
     queryset = Product.objects.all()
     serializer_class = ProductSerializer(queryset, many=True)
+    lookup_field = "slug"
 
     @extend_schema(responses=ProductSerializer(many=True))
     def list(self, request, *args, **kwargs):
         return Response(self.serializer_class.data)
 
-    @action(detail=False, methods=['get'], url_path=r'category/(?P<category>\w+)/all', url_name='all')
+    # def retrieve(self, request, pk=None):
+    #     """
+    #     A simple ViewSet for listing or retrieving categories by pk.
+    #     """
+
+    #     filtered_queryset = self.queryset.filter(pk=pk)
+    #     serializer = ProductSerializer(filtered_queryset, many=True)
+    #     return Response(serializer.data)
+
+    # Product by slug
+    def retrieve(self, request, slug=None):
+        """
+        A simple ViewSet for listing or retrieving categories by slug.
+        """
+
+        filtered_queryset = self.queryset.filter(slug=slug)
+        serializer = ProductSerializer(filtered_queryset, many=True)
+        return Response(serializer.data)
+
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path=r"category/(?P<category>\w+)/all",
+        url_name="all",
+    )
     def list_product_by_category(self, request, category=None):
         """
         A simple ViewSet for listing or retrieving categories by category.
