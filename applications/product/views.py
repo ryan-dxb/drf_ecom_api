@@ -95,14 +95,14 @@ class ProductViewSet(viewsets.ViewSet):
     @action(
         detail=False,
         methods=["get"],
-        url_path=r"category/(?P<category>\w+)/all",
+        url_path=r"category/(?P<slug>\w+)/all",
         url_name="all",
     )
-    def list_product_by_category(self, request, category=None):
+    def list_product_by_category_slug(self, request, slug=None):
         """
         A simple ViewSet for listing or retrieving categories by category.
         """
 
-        filtered_queryset = self.queryset.filter(category__name=category)
+        filtered_queryset = self.queryset.filter(category__slug=slug)
         serializer = ProductSerializer(filtered_queryset, many=True)
         return Response(serializer.data)
