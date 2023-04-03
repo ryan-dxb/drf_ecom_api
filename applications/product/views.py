@@ -47,7 +47,8 @@ class ProductViewSet(viewsets.ViewSet):
 
     # queryset = Product.objects.all()  # Default queryset (Default Manager)
     queryset = Product.objects.is_active()
-    # queryset = Product.isActive.is_active()  # Custom queryset (Custom Manager)
+    # queryset = Product.isActive.is_active()  # Custom queryset (Custom
+    # Manager)
     serializer_class = ProductSerializer(queryset, many=True)
     lookup_field = "slug"
 
