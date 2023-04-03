@@ -2,6 +2,19 @@ from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey
 
 
+# class ActiveManager(models.Manager):
+#     # def get_queryset(self):
+#     #     return super().get_queryset().filter(is_active=True)
+
+#     def is_active(self):
+#         return self.get_queryset().filter(is_active=True)
+
+
+class ActiveQuerySet(models.QuerySet):
+    def is_active(self):
+        return self.filter(is_active=True)
+
+
 class Category(MPTTModel):
     name = models.CharField(max_length=100)
     parent = TreeForeignKey(
@@ -35,6 +48,9 @@ class Product(models.Model):
     category = TreeForeignKey(
         Category, on_delete=models.SET_NULL, null=True, blank=True
     )
+    is_active = models.BooleanField(default=False)
+    objects = ActiveQuerySet.as_manager()
+    # isActive = ActiveManager()
 
     def __str__(self):
         return self.name

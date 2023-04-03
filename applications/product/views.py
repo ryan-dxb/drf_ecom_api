@@ -45,7 +45,9 @@ class ProductViewSet(viewsets.ViewSet):
     A simple ViewSet for listing or retrieving categories.
     """
 
-    queryset = Product.objects.all()
+    # queryset = Product.objects.all()  # Default queryset (Default Manager)
+    queryset = Product.objects.is_active()
+    # queryset = Product.isActive.is_active()  # Custom queryset (Custom Manager)
     serializer_class = ProductSerializer(queryset, many=True)
     lookup_field = "slug"
 
