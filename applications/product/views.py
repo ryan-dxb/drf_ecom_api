@@ -3,6 +3,13 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+# from django.db import connection
+# from pygments import highlight
+# from pygments.formatters import TerminalFormatter
+# from pygments.lexers.sql import SqlLexer
+# from sqlparse import format
+
+
 from .models import Category, Brand, Product
 from .serializers import CategorySerializer, BrandSerializer, ProductSerializer
 
@@ -61,9 +68,26 @@ class ProductViewSet(viewsets.ViewSet):
         A simple ViewSet for listing or retrieving categories by slug.
         """
 
-        filtered_queryset = self.queryset.filter(slug=slug)
+        filtered_queryset = (
+            self.queryset.filter(slug=slug)
+            .select_related("category", "brand")
+            .prefetch_related("product_line")
+        )
         serializer = ProductSerializer(filtered_queryset, many=True)
-        return Response(serializer.data)
+
+        resData = Response(serializer.data)
+
+        # queries = list(connection.queries)
+
+        # print("Total queries: ", len(queries))
+
+        # for query in queries:
+        #     sqlformatted = format(str(query["sql"]), reindent=True)
+
+        #     # Show the SQL query
+        #     print(highlight(sqlformatted, SqlLexer(), TerminalFormatter()))
+
+        return resData
 
     @action(
         detail=False,
