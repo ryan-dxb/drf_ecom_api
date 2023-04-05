@@ -2,12 +2,13 @@ from drf_spectacular.utils import extend_schema
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.db.models import Prefetch
 
-# from django.db import connection
-# from pygments import highlight
-# from pygments.formatters import TerminalFormatter
-# from pygments.lexers.sql import SqlLexer
-# from sqlparse import format
+from django.db import connection
+from pygments import highlight
+from pygments.formatters import TerminalFormatter
+from pygments.lexers.sql import SqlLexer
+from sqlparse import format
 
 
 from .models import Category, Brand, Product
@@ -72,23 +73,23 @@ class ProductViewSet(viewsets.ViewSet):
         """
 
         filtered_queryset = (
-            self.queryset.filter(slug=slug)
-            .select_related("category", "brand")
-            .prefetch_related("product_line")
+            self.queryset.filter(slug=slug).select_related("category", "brand")
+            # .prefetch_related(Prefetch("product_line"))
+            .prefetch_related(Prefetch("product_line__product_image"))
         )
         serializer = ProductSerializer(filtered_queryset, many=True)
 
         resData = Response(serializer.data)
 
-        # queries = list(connection.queries)
+        queries = list(connection.queries)
 
-        # print("Total queries: ", len(queries))
+        print("Total queries: ", len(queries))
 
-        # for query in queries:
-        #     sqlformatted = format(str(query["sql"]), reindent=True)
+        for query in queries:
+            sqlformatted = format(str(query["sql"]), reindent=True)
 
-        #     # Show the SQL query
-        #     print(highlight(sqlformatted, SqlLexer(), TerminalFormatter()))
+            # Show the SQL query
+            print(highlight(sqlformatted, SqlLexer(), TerminalFormatter()))
 
         return resData
 
