@@ -23,9 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = (
-    "django-insecure-0*)2ffjg$-(xj*%c&r_*^=9m4))l@933ru7p1g#xkgy*#&^-+="
-)
+SECRET_KEY = "django-insecure-0*)2ffjg$-(xj*%c&r_*^=9m4))l@933ru7p1g#xkgy*#&^-+="
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", False)
@@ -130,5 +128,6 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "Django DRF API",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    "SCHEMA_PATH_PREFIX": r"/api/",
     # OTHER SETTINGS
 }

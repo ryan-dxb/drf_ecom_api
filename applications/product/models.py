@@ -55,12 +55,46 @@ class Product(models.Model):
         return self.name
 
 
+class Attribute(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+    # Change plural name
+    class Meta:
+        verbose_name_plural = "Attributes"
+
+
+class AttributeValue(models.Model):
+    attribute_value = models.CharField(max_length=100)
+    attribute = models.ForeignKey(
+        Attribute, on_delete=models.CASCADE, related_name="attribute_value"
+    )
+
+    def __str__(self):
+        return self.value
+
+    # Change plural name
+    class Meta:
+        verbose_name_plural = "Attribute Values"
+
+
 class ProductLine(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     sku = models.CharField(max_length=100)
     stock_quantity = models.IntegerField()
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="product_line")
     order = OrderField(unique_for_field="product")
+    attribute_values = models.ManyToManyField(
+        AttributeValue,
+        through="ProductLineAttributeValues",
+        related_name="product_line_attribute_values",
+    )
+    product_type = models.ForeignKey(
+        "ProductType", on_delete=models.CASCADE, related_name="product_line_product_type"
+    )
 
     is_active = models.BooleanField(default=False)
 
@@ -77,6 +111,30 @@ class ProductLine(models.Model):
 
     def __str__(self):
         return self.sku
+
+    # Change plural name
+    class Meta:
+        verbose_name_plural = "Product Lines"
+
+
+class ProductLineAttributeValues(models.Model):
+    attribute_value = models.ForeignKey(
+        AttributeValue, on_delete=models.CASCADE, related_name="product_line_attribute_value"
+    )
+    product_line = models.ForeignKey(
+        ProductLine,
+        on_delete=models.CASCADE,
+        related_name="product_line_attribute_product_line",
+    )
+
+    def __str__(self):
+        return self.attribute_value
+
+    # Change plural name
+    # Unique together
+    class Meta:
+        verbose_name_plural = "Product Line Attribute Values"
+        unique_together = ("attribute_value", "product_line")
 
 
 class ProductImage(models.Model):
@@ -104,3 +162,37 @@ class ProductImage(models.Model):
     # Change plural name
     class Meta:
         verbose_name_plural = "Product Images"
+
+
+class ProductType(models.Model):
+    name = models.CharField(max_length=100)
+    attributes = models.ManyToManyField(
+        Attribute, through="ProductTypeAttribute", related_name="product_type_attributes"
+    )
+
+    def __str__(self):
+        return self.name
+
+    # Change plural name
+    class Meta:
+        verbose_name_plural = "Product Types"
+
+
+class ProductTypeAttribute(models.Model):
+    product_type = models.ForeignKey(
+        ProductType,
+        on_delete=models.CASCADE,
+        related_name="product_type_attribute_product_type",
+    )
+    attribute = models.ForeignKey(
+        Attribute, on_delete=models.CASCADE, related_name="product_type_attribute"
+    )
+
+    def __str__(self):
+        return self.attribute
+
+    # Unique together
+    # Change plural name
+    class Meta:
+        verbose_name_plural = "Product Type Attributes"
+        unique_together = ("product_type", "attribute")
