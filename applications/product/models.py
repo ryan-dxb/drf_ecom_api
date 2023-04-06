@@ -73,8 +73,8 @@ class AttributeValue(models.Model):
         Attribute, on_delete=models.CASCADE, related_name="attribute_value"
     )
 
-    def __str__(self):
-        return self.value
+    # def __str__(self):
+    #     return self.attribute.attribute_value
 
     # Change plural name
     class Meta:
@@ -109,8 +109,8 @@ class ProductLine(models.Model):
         self.full_clean()
         return super(ProductLine, self).save(*args, **kwargs)
 
-    def __str__(self):
-        return self.sku
+    # def __str__(self):
+    #     return self.sku
 
     # Change plural name
     class Meta:
@@ -127,14 +127,33 @@ class ProductLineAttributeValues(models.Model):
         related_name="product_line_attribute_product_line",
     )
 
-    def __str__(self):
-        return self.attribute_value
+    # def __str__(self):
+    #     return self.attribute_value
 
     # Change plural name
     # Unique together
     class Meta:
         verbose_name_plural = "Product Line Attribute Values"
         unique_together = ("attribute_value", "product_line")
+
+    def clean(self):
+        qs = (
+            ProductLineAttributeValues.objects.filter(attribute_value=self.attribute_value)
+            .filter(product_line=self.product_line)
+            .exists()
+        )
+
+        if not qs:
+            iqs = Attribute.objects.filter(
+                attribute_value__product_line_attribute_values=self.product_line
+            ).values_list("pk", flat=True)
+
+            if self.attribute_value.attribute.id in list(iqs):
+                raise ValidationError("Attribute already exists for this product line.")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super(ProductLineAttributeValues, self).save(*args, **kwargs)
 
 
 class ProductImage(models.Model):
@@ -170,8 +189,8 @@ class ProductType(models.Model):
         Attribute, through="ProductTypeAttribute", related_name="product_type_attributes"
     )
 
-    def __str__(self):
-        return self.name
+    # def __str__(self):
+    #     return self.name
 
     # Change plural name
     class Meta:
@@ -187,9 +206,6 @@ class ProductTypeAttribute(models.Model):
     attribute = models.ForeignKey(
         Attribute, on_delete=models.CASCADE, related_name="product_type_attribute"
     )
-
-    def __str__(self):
-        return self.attribute
 
     # Unique together
     # Change plural name

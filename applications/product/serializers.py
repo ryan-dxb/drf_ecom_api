@@ -62,10 +62,14 @@ class ProductLineSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         att_data = data.pop("attribute_values")
 
+        print(att_data)
         attr_values = {}
 
         for key in att_data:
-            attr_values.update({key["attribute"]["id"]: key["attribute_value"]})
+            print("Key: " + str(key["attribute"]))
+            attr_values.update({key["attribute"]: key["attribute_value"]})
+
+        print(attr_values)
 
         data.update({"specification": attr_values})
 
