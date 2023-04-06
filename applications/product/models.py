@@ -47,6 +47,9 @@ class Product(models.Model):
     is_digital = models.BooleanField(default=False)
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
     category = TreeForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
+    product_type = models.ForeignKey(
+        "ProductType", on_delete=models.CASCADE, related_name="product_line_product_type"
+    )
     is_active = models.BooleanField(default=False)
     objects = ActiveQuerySet.as_manager()
     # isActive = ActiveManager()
@@ -91,9 +94,6 @@ class ProductLine(models.Model):
         AttributeValue,
         through="ProductLineAttributeValues",
         related_name="product_line_attribute_values",
-    )
-    product_type = models.ForeignKey(
-        "ProductType", on_delete=models.CASCADE, related_name="product_line_product_type"
     )
 
     is_active = models.BooleanField(default=False)
